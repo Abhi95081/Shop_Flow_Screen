@@ -1,7 +1,6 @@
 # ShopFlow - Android Shopping App
 
-![ShopFlow Home Screen]![image](https://github.com/user-attachments/assets/e2a423fb-ef98-44ed-bd2b-02bdda351590)
-
+![ShopFlow Home Screen]![image](https://github.com/user-attachments/assets/6a134dd6-96a0-4d0c-91ca-cb7c11c0d3aa)
 
 **ShopFlow** is a modern Android shopping app built with Jetpack Compose, featuring a sleek and intuitive user interface for browsing beauty products. The app includes a vibrant home screen with category filtering, product cards, favorites, and cart functionality, designed to provide a seamless shopping experience.
 
