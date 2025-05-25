@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,7 +35,6 @@ import com.example.shopflowscreen.Products.Product
 import com.example.shopflowscreen.Products.ProductCard
 import com.example.shopflowscreen.Products.productList
 import kotlinx.coroutines.launch
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
@@ -45,105 +45,73 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = Color(0xFF00BFA5),
+                    contentColor = Color.White,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         "ShopFlow",
                         fontWeight = FontWeight.Black,
-                        fontSize = 30.sp,
+                        fontSize = 26.sp,
                         color = Color.White,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                ),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 modifier = Modifier
                     .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(Color(0xFF00BFA5), Color(0xFF0288D1))
+                        brush = Brush.horizontalGradient(
+                            listOf(Color(0xFF00BFA5), Color(0xFF0288D1))
                         )
                     )
-                    .shadow(6.dp),
+                    .shadow(4.dp)
+                    .padding(horizontal = 4.dp),
                 actions = {
-                    BadgedBox(
-                        badge = {
-                            if (favoriteItems.isNotEmpty()) {
-                                Badge(
-                                    modifier = Modifier.offset(x = (-8).dp, y = 8.dp)
-                                ) { Text("${favoriteItems.size}") }
+                    IconWithBadge(
+                        count = favoriteItems.size,
+                        icon = Icons.Default.Favorite,
+                        contentDescription = "Favorites",
+                        onClick = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    if (favoriteItems.isEmpty()) "No favorites" else "Favorites: ${favoriteItems.size} items"
+                                )
                             }
                         }
-                    ) {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        if (favoriteItems.isEmpty()) "No favorites" else "Favorites: ${favoriteItems.size} items"
-                                    )
-                                }
-                            },
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.White.copy(alpha = 0.2f), CircleShape)
-                        ) {
-                            Icon(
-                                Icons.Default.Favorite,
-                                contentDescription = "Favorites",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                    IconButton(
+                    )
+                    IconWithBadge(
+                        count = 0,
+                        icon = Icons.Default.Search,
+                        contentDescription = "Search",
                         onClick = {
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar("Search opened")
                             }
-                        },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(Color.White.copy(alpha = 0.2f), CircleShape)
-                    ) {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    BadgedBox(
-                        badge = {
-                            if (cartItems.isNotEmpty()) {
-                                Badge(
-                                    modifier = Modifier.offset(x = (-8).dp, y = 8.dp)
-                                ) { Text("${cartItems.size}") }
+                        }
+                    )
+                    IconWithBadge(
+                        count = cartItems.size,
+                        icon = Icons.Default.ShoppingCart,
+                        contentDescription = "Cart",
+                        onClick = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    if (cartItems.isEmpty()) "Cart is empty" else "Cart: ${cartItems.size} items"
+                                )
                             }
                         }
-                    ) {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        if (cartItems.isEmpty()) "Cart is empty" else "Cart: ${cartItems.size} items"
-                                    )
-                                }
-                            },
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.White.copy(alpha = 0.2f), CircleShape)
-                        ) {
-                            Icon(
-                                Icons.Default.ShoppingCart,
-                                contentDescription = "Cart",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
+                    )
                 }
             )
         },
@@ -152,42 +120,48 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 modifier = modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(Color(0xFFF5F7FA))
+                    .background(Color(0xFFF8FAFC))
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp)
+                        .height(160.dp)
                         .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFF00BFA5), Color(0xFF0288D1))
+                            brush = Brush.verticalGradient(
+                                listOf(Color(0xFF00BFA5), Color(0xFF0288D1))
                             )
                         )
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Explore Beauty Essentials",
+                        "Explore Beauty Essentials",
                         color = Color.White,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
                     )
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Category Section
                 CategorySection(
                     selectedCategory = selectedCategory.value,
                     onCategorySelected = { selectedCategory.value = it }
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+
+                Spacer(modifier = Modifier.height(20.dp))
+
                 Text(
-                    text = "Trending Now",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Black,
-                    color = Color(0xFF121212),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    text = "✨ Trending Now",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF333333)
+                    ),
+                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+
                 LazyColumn(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -230,5 +204,43 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             }
         }
     )
+}
+
+@Composable
+fun IconWithBadge(
+    count: Int,
+    icon: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit
+) {
+    BadgedBox(
+        badge = {
+            if (count > 0) {
+                Badge(
+                    modifier = Modifier.offset(x = (-8).dp, y = 8.dp)
+                ) {
+                    Text("$count")
+                }
+            }
+        }
+    ) {
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier
+                .size(40.dp)
+                .background(
+                    color = Color.White.copy(alpha = 0.1f),
+                    shape = CircleShape
+                )
+                .shadow(4.dp, CircleShape)
+        ) {
+            Icon(
+                icon,
+                contentDescription = contentDescription,
+                tint = Color.White,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+    }
 }
 
