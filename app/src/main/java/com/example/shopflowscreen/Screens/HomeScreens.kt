@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.shopflowscreen.Products.Product
 import com.example.shopflowscreen.Products.ProductCard
 import com.example.shopflowscreen.Products.productList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,30 +124,12 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     .padding(paddingValues)
                     .background(Color(0xFFF8FAFC))
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                listOf(Color(0xFF00BFA5), Color(0xFF0288D1))
-                            )
-                        )
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "Explore Beauty Essentials",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                AutoScrollingProductBanner(
+                    productList = productList.take(6)
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Category Section
                 CategorySection(
                     selectedCategory = selectedCategory.value,
                     onCategorySelected = { selectedCategory.value = it }
@@ -204,6 +188,54 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             }
         }
     )
+}
+
+@Composable
+fun AutoScrollingProductBanner(productList: List<Product>) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(2500L) // Change delay as needed
+            val nextIndex = (listState.firstVisibleItemIndex + 1) % productList.size
+            coroutineScope.launch {
+                listState.animateScrollToItem(nextIndex)
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(Color(0xFF00BFA5), Color(0xFF0288D1))
+                )
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        LazyRow(
+            state = listState,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(productList) { product ->
+                Image(
+                    painter = painterResource(id = product.imageRes),
+                    contentDescription = product.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            // Handle click if needed
+                        }
+                )
+            }
+        }
+    }
 }
 
 @Composable
